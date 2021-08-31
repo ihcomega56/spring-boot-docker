@@ -1,0 +1,7 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '--build-arg', 'JAR_FILE=build/libs/*.jar', '-t', 'gcr.io/$PROJECT_ID/spring-boot-docker', '.' ]
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args: ['-c', 'gcloud config set app/cloud_build_timeout 300 && gcloud app deploy']
+timeout: '300s'
