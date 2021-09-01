@@ -8,19 +8,20 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
-      - '-c'
-      - |-
-        echo $$APIKEY | docker login ${_JFROG_PLATFORM_URL} --username=${_JFROG_PLATFORM_USER} --password-stdin
-        docker tag gcr.io/$PROJECT_ID/spring-boot-docker:latest ${_JFROG_PLATFORM_URL}/spring-docker/spring-boot-docker:latest
-        docker push ${_JFROG_PLATFORM_URL}/spring-docker/spring-boot-docker:latest
+    - '-c'
+    - |-
+      echo $$APIKEY | docker login ${_JFROG_PLATFORM_URL} --username=${_JFROG_PLATFORM_USER} --password-stdin
+      docker tag gcr.io/$PROJECT_ID/spring-boot-docker:latest ${_JFROG_PLATFORM_URL}/spring-docker/spring-boot-docker:latest
+      docker push ${_JFROG_PLATFORM_URL}/spring-docker/spring-boot-docker:latest
     secretEnv: ['APIKEY']
   - name: 'releases-docker.jfrog.io/jfrog/jfrog-cli-v2'
     entrypoint: 'bash'
     args:
     - '-c'
     - |-
+      apk add docker
       jfrog c add my-jfrog-server --url=https://${_JFROG_PLATFORM_URL}/ --user=${_JFROG_PLATFORM_USER} --password=$$APIKEY
-      jfrog rt dp ${_JFROG_PLATFORM_URL}/spring-boot-docker:latest spring-docker --build-name=spring-boot-docker-build --build-number=${BUILD_ID} --server-id=my-jfrog-server
+      jfrog rt dp ${_JFROG_PLATFORM_URL}/spring-docker/spring-boot-docker:latest spring-docker --build-name=spring-boot-docker-build --build-number=${BUILD_ID} --server-id=my-jfrog-server
       jfrog rt bp spring-boot-docker-build ${BUILD_ID}
     secretEnv: ['APIKEY']
 timeout: '600s'
