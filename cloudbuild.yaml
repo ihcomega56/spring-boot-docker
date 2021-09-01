@@ -1,7 +1,21 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'build', '--build-arg', 'JAR_FILE=build/libs/*.jar', '-t', 'gcr.io/$PROJECT_ID/spring-boot-docker', '.' ]
+    args: ['build', '--build-arg', 'JAR_FILE=build/libs/*.jar', '-t', 'gcr.io/$PROJECT_ID/spring-boot-docker', '.' ]
+    dir: 'spring-boot-docker'
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
     args: ['-c', 'gcloud config set app/cloud_build_timeout 300 && gcloud app deploy']
-timeout: '300s'
+    dir: 'spring-boot-docker'
+  - name: 'releases-docker.jfrog.io/jfrog/jfrog-cli-v2'
+    entrypoint: 'bash'
+    args: ['-c', 'jfrog c add my-jfrog-server --url=https://${_ARTIFACTORY_URL}/artifactory --user=${_ARTIFACTORY_USER} --password=$$APIKEY']
+    secretEnv: ['APIKEY']
+    dir: 'spring-boot-docker'
+  - name: 'bash'
+    args: ['-c', 'jfrog rt docker-push gcr.io/$PROJECT_ID/spring-boot-docker spring-docker-virtual --build-name=spring-boot-docker-build --build-number=$BUILD_ID']
+timeout: '600s'
+
+secrets:
+  - kmsKeyName: 'projects/$PROJECT_ID/locations/global/keyRings/spring-docker-keyring/cryptoKeys/key-example'
+    secretEnv:
+      APIKEY: 'CiQAy/L6lVzsfbJqvTbOInV71GDrfUnHFPMbclD7a45xkGgsXlkScwAbTXpQ7gUCXwLhVYLC9BaGcGx7KmaSjuIaErsNQ7CacG/Jetll1xpDc/ITCAr+WrCZqYSktGWyvmE4zSBct9cMWPdVgPnoc1mmOst9iiD1S8G9QeCu8xY9XFYJq/T5K+Cu5lchGtAfWRNB8c1QA58/Qk4='
