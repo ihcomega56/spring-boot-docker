@@ -6,7 +6,6 @@ steps:
     - |-
       docker build --build-arg JAR_FILE==build/libs/*.jar -t gcr.io/$PROJECT_ID/spring-boot-docker .
       docker tag gcr.io/$PROJECT_ID/spring-boot-docker:latest ${_JFROG_PLATFORM_URL}/spring-docker/spring-boot-docker:latest
-    secretEnv: ['APIKEY']
   - name: 'releases-docker.jfrog.io/jfrog/jfrog-cli-v2'
     entrypoint: 'bash'
     args:
