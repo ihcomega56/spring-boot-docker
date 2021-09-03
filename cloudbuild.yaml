@@ -17,10 +17,6 @@ steps:
       jfrog rt bp spring-boot-docker-build ${BUILD_ID}
       jfrog rt bs spring-boot-docker-build ${BUILD_ID}
     secretEnv: ['APIKEY']
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'bash'
-    args: ['-c', 'gcloud config set app/cloud_build_timeout 300 && gcloud app deploy']
-timeout: '600s'
 secrets:
   - kmsKeyName: projects/dark-hall-324609/locations/global/keyRings/spring-docker-keyring/cryptoKeys/key-example
     secretEnv:
